@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter for all text -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Light gray background gradient as requested */
+            background: linear-gradient(135deg, #f2f3f4 0%, #ccd1d1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Abstract background shapes for dynamism - adjusted for light background */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.05); /* Subtle dark transparency for visibility on light bg */
+            filter: blur(70px);
+            z-index: -1;
+        }
+
+        body::before {
+            width: 350px;
+            height: 350px;
+            top: -80px;
+            left: -80px;
+            animation: float1 15s infinite ease-in-out;
+        }
+
+        body::after {
+            width: 450px;
+            height: 450px;
+            bottom: -100px;
+            right: -100px;
+            animation: float2 18s infinite ease-in-out;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 30px); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, -20px); }
+        }
+
+        /* Form container with a modern, slightly elevated look */
+        .modern-vibrant-card {
+            background-color: #ffffff; /* Pure white card */
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2); /* Stronger, more defined shadow */
+            transition: all 0.4s ease-in-out;
+            transform: rotateZ(-1deg); /* Slight initial rotation */
+        }
+        .modern-vibrant-card:hover {
+            transform: rotateZ(0deg) translateY(-5px); /* Straighten and lift on hover */
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.3); /* Even deeper shadow on hover */
+        }
+
+        /* Custom styles for the message box */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 1.25rem 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            pointer-events: none;
+            font-weight: 500;
+        }
+        .message-box.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .message-box.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        /* Input group styling for icon and input */
+        .input-group {
+            position: relative;
+        }
+        .input-group .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 70%;
+            transform: translateY(-50%);
+            color: #9ca3af; /* Gray-400 */
+            transition: color 0.3s ease-in-out;
+        }
+        .input-group input:focus + .input-icon {
+            color: #4f46e5; /* Indigo-600 for focus */
+        }
+        .input-group input {
+            padding-left: 3rem !important; /* Make space for the icon */
+            border-radius: 0.75rem; /* More rounded for softer look */
+            background-color: #f8fafc; /* Lightest gray background */
+        }
+
+        /* Image container styling */
+        .image-container {
+            flex-shrink: 0; /* Prevent image from shrinking */
+            width: 448px; /* Adjusted width to match form's max-w-md */
+            height: 672px; /* Adjusted height to maintain aspect ratio (1.5x width) */
+            border-radius: 1.5rem; /* Rounded corners for the image container */
+            overflow: hidden; /* Ensure image respects border-radius */
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2); /* Shadow matching the card */
+            margin-right: 2rem; /* Space between image and form */
+            position: relative;
+            background-color: #1a202c; /* Fallback background for image container */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the container, cropping if necessary */
+            display: block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .login-wrapper {
+                flex-direction: column; /* Stack image and form vertically on small screens */
+            }
+            .image-container {
+                width: 100%; /* Full width on small screens */
+                height: 300px; /* Shorter height on small screens */
+                margin-right: 0;
+                margin-bottom: 2rem; /* Space below image */
+            }
+            .modern-vibrant-card {
+                transform: rotateZ(0deg); /* No initial rotation on small screens */
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Overall Wrapper for Image and Login Form -->
+    <div class="login-wrapper flex items-center justify-center p-4">
+        <!-- Image Container -->
+        <div class="image-container">
+            <img src="https://i.postimg.cc/tgCPs4pZ/Whats-App-Image-2025-07-19-at-11-25-06-AM.jpg" alt="User Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/350x550/000000/FFFFFF?text=Image+Not+Found';" />
+        </div>
+
+        <!-- Login Form Container -->
+        <div class="modern-vibrant-card p-12 rounded-2xl w-full max-w-md">
+            <h2 class="text-5xl font-extrabold text-center mb-4 text-gray-800 leading-tight">Hello There!</h2>
+            <p class="text-center text-gray-600 mb-10 text-lg">Let's get you signed in</p>
+
+            <form id="loginForm" class="space-y-8">
+                <div class="input-group">
+                    <label for="yourName" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input
+                        type="text"
+                        id="yourName"
+                        name="yourName"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300 ease-in-out text-base"
+                        placeholder="Enter your name"
+                        required
+                    >
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                <div class="input-group">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username or Email</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300 ease-in-out text-base"
+                        placeholder="Enter your username or email"
+                        required
+                    >
+                    <i class="fas fa-envelope input-icon"></i>
+                </div>
+                <div class="input-group">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300 ease-in-out text-base"
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <i class="fas fa-lock input-icon"></i>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <div class="flex items-center">
+                        <input
+                            id="remember_me"
+                            name="remember_me"
+                            type="checkbox"
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        >
+                        <label for="remember_me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition duration-200 ease-in-out">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <div>
+                    <button
+                        type="submit"
+                        class="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-2xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
+                    >
+                        Log In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Box -->
+    <div id="messageBox" class="message-box"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const yourName = document.getElementById('yourName').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageBox = document.getElementById('messageBox');
+
+            // Clear previous messages
+            messageBox.textContent = '';
+            messageBox.className = 'message-box'; // Reset classes
+
+            // Simple validation (replace with actual authentication logic)
+            if (username === 'user@example.com' && password === 'password123') {
+                showMessage('Login successful!', 'success');
+                // In a real application, you would redirect to a dashboard or home page
+                // window.location.href = '/dashboard';
+            } else {
+                showMessage('Invalid username or password. Please try again.', 'error');
+            }
+        });
+
+        /**
+         * Displays a message in the message box.
+         * @param {string} message - The message to display.
+         * @param {'success'|'error'} type - The type of message (success or error).
+         */
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.classList.add('show', type);
+
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
